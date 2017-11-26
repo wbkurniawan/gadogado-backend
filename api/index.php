@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 include_once(__DIR__.'/../config/global.php');
 include_once(__DIR__.'/../model/class/Product.php');
+include_once(__DIR__.'/../model/class/Track.php');
 
 $app = new Silex\Application();
 $app['debug'] = true;
@@ -30,6 +31,36 @@ $app['debug'] = true;
 //    $response->setContent($result);
 //    return $response;
 //});
+
+//ALEXA TRACK IT
+$app->get('/track/add', function (Request $request) use($app) {
+    $response = new Response();
+    $response->headers->set('Content-Type','application/json;charset=utf-8');
+
+    $userId = $request->get('userId');
+    $category = $request->get('category');
+    $value1 = $request->get('value1');
+    $value2 = $request->get('value2');
+    $created = $request->get('created',date('Y-m-d H:i:s'));
+
+    $track = new Track();
+    $result["result"] = $track->add($userId,$category,$value1,$value2,$created);
+
+    return $app->json($result);
+});
+
+$app->get('/track/last', function (Request $request) use($app) {
+    $response = new Response();
+    $response->headers->set('Content-Type','application/json;charset=utf-8');
+
+    $userId = $request->get('userId');
+    $category = $request->get('category');
+
+    $track = new Track();
+    $result = $track->getLastEntryByCategory($userId,$category);
+//    $response->setContent($result);
+    return $app->json($result);
+});
 
 
 $app->get('/product/{id}', function ($id) use($app) {
